@@ -1,9 +1,0 @@
-{
-  "name": "youtube-downloader",
-  "version": "1.0.0",
-  "description": "Client-side YouTube video downloader",
-  "private": true,
-  "scripts": {
-    "build": "echo 'No build step required'"
-  }
-}
