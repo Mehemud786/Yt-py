@@ -1,8 +1,8 @@
 import os
+import traceback
 from flask import Flask, render_template, request, jsonify
 from pytubefix import YouTube
 
-# Get absolute path to the project root for templates
 basedir = os.path.abspath(os.path.dirname(__file__))
 template_dir = os.path.join(basedir, '../templates')
 
@@ -21,8 +21,11 @@ def get_video():
         return jsonify({'error': 'No URL provided'}), 400
         
     try:
+        # Initialize pytubefix
         yt = YouTube(url)
+        
         streams = []
+        # Fetch progressive streams
         for stream in yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution'):
             if stream.resolution:
                 streams.append({
@@ -36,4 +39,10 @@ def get_video():
             'streams': streams
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Print full error traceback to Vercel logs for debugging
+        error_details = traceback.format_exc()
+        print(error_details)
+        return jsonify({'error': f"Server Error: {str(e)}"}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
