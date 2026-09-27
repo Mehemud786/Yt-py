@@ -1,16 +1,88 @@
-import os
 import traceback
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template_string, request, jsonify
 from pytubefix import YouTube
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-template_dir = os.path.join(basedir, '../templates')
+app = Flask(__name__)
 
-app = Flask(__name__, template_folder=template_dir)
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-xl w-full bg-gray-800 p-6 rounded-2xl shadow-xl">
+        <h1 class="text-2xl font-bold mb-4 text-center text-red-500">YouTube Downloader</h1>
+        
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="urlInput" placeholder="Paste YouTube URL here..." 
+                class="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none focus:border-red-500">
+            <button onclick="fetchVideo()" id="fetchBtn" 
+                class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg font-semibold transition">Search</button>
+        </div>
+
+        <div id="loading" class="hidden text-center text-gray-400 mb-4">Fetching video details...</div>
+
+        <div id="resultContainer" class="hidden flex flex-col items-center">
+            <img id="thumbnail" src="" alt="Thumbnail" class="rounded-lg mb-4 w-full object-cover max-h-60">
+            <h2 id="videoTitle" class="text-lg font-semibold mb-4 text-center"></h2>
+            <div id="streamsList" class="w-full flex flex-col gap-2"></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchVideo() {
+            const url = document.getElementById('urlInput').value;
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('resultContainer');
+            const streamsList = document.getElementById('streamsList');
+            
+            if (!url) return alert('Please enter a YouTube URL');
+
+            loading.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            streamsList.innerHTML = '';
+
+            try {
+                const response = await fetch('/get-video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                document.getElementById('thumbnail').src = data.thumbnail;
+                document.getElementById('videoTitle').innerText = data.title;
+
+                data.streams.forEach(stream => {
+                    const a = document.createElement('a');
+                    a.href = stream.url;
+                    a.innerText = `Download MP4 (${stream.resolution})`;
+                    a.target = '_blank';
+                    a.className = 'block text-center bg-green-600 hover:bg-green-700 p-2 rounded-lg font-medium transition';
+                    streamsList.appendChild(a);
+                });
+
+                resultContainer.classList.remove('hidden');
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
+"""
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template_string(HTML_TEMPLATE)
 
 @app.route('/get-video', methods=['POST'])
 def get_video():
@@ -21,11 +93,8 @@ def get_video():
         return jsonify({'error': 'No URL provided'}), 400
         
     try:
-        # Bypass potential client restrictions using a standard user agent
         yt = YouTube(url, use_oauth=False, allow_oauth_cache=False)
-        
         streams = []
-        # Filter progressive MP4 streams safely
         for stream in yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution'):
             if stream.resolution:
                 streams.append({
@@ -40,13 +109,11 @@ def get_video():
         })
     except Exception as e:
         err_msg = str(e)
-        print(f"Error processing URL: {err_msg}")
         print(traceback.format_exc())
         
-        # Friendly message if YouTube blocks Vercel's server IP
         if "Sign in to confirm" in err_msg or "bot" in err_msg.lower():
             return jsonify({
-                'error': 'YouTube blocked this cloud server IP (Bot detection). Vercel serverless functions cannot reliably fetch YouTube streams. Consider hosting this on a local machine or a private VPS.'
+                'error': 'YouTube blocked Vercel’s server IP (Bot detection). Try hosting this locally or on a standard VPS.'
             }), 400
             
         return jsonify({'error': f'Failed to fetch video: {err_msg}'}), 400
