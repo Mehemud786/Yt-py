@@ -19,7 +19,7 @@ def download_reel():
             'no_warnings': True,
         }
         
-        # Optional: Handle cookies if Instagram blocks unauthenticated requests
+        # Inject cookies if provided in environment variables
         cookies_content = os.environ.get('INSTA_COOKIES')
         if cookies_content:
             cookie_file_path = '/tmp/cookies.txt'
@@ -42,8 +42,8 @@ def download_reel():
         
     except Exception as e:
         error_msg = str(e)
-        if "login required" in error_msg.lower() or "empty media response" in error_msg.lower():
-            error_msg = "Instagram is blocking cloud server requests. Please configure cookies (see instructions below)."
+        if "login required" in error_msg.lower() or "empty media response" in error_msg.lower() or "requested content is not available" in error_msg.lower():
+            error_msg = "Instagram is blocking server requests. You MUST add your Instagram account cookies to Vercel environment variables (see instructions below)."
         return jsonify({"success": False, "error": error_msg}), 500
 
 if __name__ == '__main__':
