@@ -3,7 +3,6 @@ import traceback
 from flask import Flask, render_template, request, jsonify
 from pytubefix import YouTube
 
-# Safely point Flask to the local templates folder inside the api directory
 basedir = os.path.abspath(os.path.dirname(__file__))
 template_dir = os.path.join(basedir, 'templates')
 
