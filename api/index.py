@@ -1,12 +1,19 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import os
+from flask import Flask, render_template, request, jsonify
 from pytubefix import YouTube
 
-app = Flask(__name__)
-CORS(app)
+# Get absolute path to the project root for templates
+basedir = os.path.abspath(os.path.dirname(__file__))
+template_dir = os.path.join(basedir, '../templates')
 
-@app.route('/api/info', methods=['POST'])
-def get_video_info():
+app = Flask(__name__, template_folder=template_dir)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/get-video', methods=['POST'])
+def get_video():
     data = request.get_json()
     url = data.get('url')
     
@@ -14,31 +21,19 @@ def get_video_info():
         return jsonify({'error': 'No URL provided'}), 400
         
     try:
-        # Initialize pytubefix YouTube object
         yt = YouTube(url)
         streams = []
-        
-        # Collect progressive MP4 streams available
-        for stream in yt.streams.filter(file_extension='mp4', progressive=True):
-            streams.append({
-                'resolution': stream.resolution,
-                'file_extension': stream.subtype,
-                'url': stream.url
-            })
-            
-        # Get audio-only format stream (.m4a)
-        audio_stream = yt.streams.get_audio_only()
-        audio_url = audio_stream.url if audio_stream else None
-        
+        for stream in yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution'):
+            if stream.resolution:
+                streams.append({
+                    'resolution': stream.resolution,
+                    'url': stream.url
+                })
+                
         return jsonify({
             'title': yt.title,
             'thumbnail': yt.thumbnail_url,
-            'author': yt.author,
-            'streams': streams,
-            'audio_url': audio_url
+            'streams': streams
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
