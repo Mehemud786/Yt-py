@@ -1,23 +1,17 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 import yt_dlp
-import os
 
-app = Flask(__name__, static_folder='../public', template_folder='../public')
-
-@app.route('/')
-def serve_index():
-    return send_from_directory(app.template_folder, 'index.html')
+app = Flask(__name__)
 
 @app.route('/api/download', methods=['POST'])
 def download_reel():
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
         url = data.get('url')
         
         if not url:
             return jsonify({"success": False, "error": "Instagram URL is required."}), 400
         
-        # Configure yt-dlp to extract the direct video URL without downloading locally
         ydl_opts = {
             'format': 'best',
             'quiet': True,
