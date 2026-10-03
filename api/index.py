@@ -23,4 +23,4 @@ def set_command(cmd: MouseCommand):
 
 @app.get("/api/command")
 def get_command():
-    return latest_commandmbb
+    return latest_command
