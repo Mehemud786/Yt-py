@@ -1,0 +1,21 @@
+{
+  "name": "wifi-mouse-controller",
+  "version": "1.0.0",
+  "description": "Wi-Fi Mouse and Keyboard remote control web application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "keywords": [
+    "wifi-mouse",
+    "remote-control",
+    "socket.io",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT"
+}
