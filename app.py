@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify
-import os
 from yt_dlp import YoutubeDL
 
 app = Flask(__name__)
@@ -37,22 +36,21 @@ def start_download():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        # Vercel serverless functions can only write to /tmp
-        output_template = os.path.join("/tmp", "%(title)s.%(ext)s")
-        
-        ydl_opts = {
-            'outtmpl': output_template,
-        }
-        
-        if format_type == "audio_320":
-            ydl_opts['format'] = 'bestaudio'
-        else:
-            ydl_opts['format'] = f"bestvideo[height<={format_type}]+bestaudio/best[height<={format_type}]"
-            
+        # Extract direct playable stream URL to avoid serverless timeout & missing ffmpeg errors
+        ydl_opts = {'format': 'best' if format_type != "audio_320" else 'bestaudio'}
         with YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            info = ydl.extract_info(url, download=False)
+            download_url = info.get("url")
             
-        return jsonify({"success": True, "message": "Download complete on cloud temporary storage!"})
+        if download_url:
+            return jsonify({
+                "success": True, 
+                "download_url": download_url,
+                "message": "Link generated successfully!"
+            })
+        else:
+            return jsonify({"success": False, "message": "Could not extract media stream."})
+            
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
 

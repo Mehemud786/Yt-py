@@ -18,7 +18,7 @@
         }
         .container {
             background: rgba(20, 20, 20, 0.85);
-            padding: 30px;
+            padding: 35px 30px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(220, 20, 60, 0.25);
             border: 1px solid rgba(220, 20, 60, 0.3);
@@ -27,7 +27,7 @@
             text-align: center;
         }
         h1 {
-            font-size: 22px;
+            font-size: 24px;
             margin-bottom: 20px;
             background: linear-gradient(90deg, #ff1a1a, #dc143c);
             -webkit-background-clip: text;
@@ -36,49 +36,31 @@
         }
         input[type="text"] {
             width: 100%;
-            padding: 12px 15px;
-            font-size: 14px;
+            padding: 14px 16px;
+            font-size: 15px;
             border-radius: 8px;
             border: 1px solid #441a1a;
             background-color: #120505;
             color: #fff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             outline: none;
         }
         .quality-label {
             display: block;
             text-align: left;
-            font-size: 13px;
+            font-size: 14px;
             color: #ff9999;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
         .quality-options {
             display: flex;
             justify-content: space-between;
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
         .quality-options label {
             flex: 1;
-            background-color: #1a0505;
-            border: 1px solid #441a1a;
-            border-radius: 8px;
-            padding: 8px 0;
-            text-align: center;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .quality-options input[type="radio"] { display: none; }
-        .quality-options label:has(input[type="radio"]:checked) {
-            background: linear-gradient(135deg, #ff0033, #dc143c);
-            border-color: #ff1a4d;
-            box-shadow: 0 0 8px rgba(255, 0, 51, 0.5);
-        }
-        .audio-option { margin-bottom: 15px; }
-        .audio-option label {
-            display: block;
             background-color: #1a0505;
             border: 1px solid #441a1a;
             border-radius: 8px;
@@ -88,64 +70,57 @@
             font-size: 13px;
             font-weight: 600;
         }
+        .quality-options input[type="radio"] { display: none; }
+        .quality-options label:has(input[type="radio"]:checked) {
+            background: linear-gradient(135deg, #ff0033, #dc143c);
+            border-color: #ff1a4d;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+        }
+        .audio-option { margin-bottom: 20px; }
+        .audio-option label {
+            display: block;
+            background-color: #1a0505;
+            border: 1px solid #441a1a;
+            border-radius: 8px;
+            padding: 12px 0;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
         .audio-option input[type="radio"] { display: none; }
         .audio-option label:has(input[type="radio"]:checked) {
             background: linear-gradient(135deg, #b30059, #800040);
             border-color: #ff1a8c;
-            box-shadow: 0 0 8px rgba(255, 0, 128, 0.5);
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
         }
-        .btn {
+        button {
             width: 100%;
             background: linear-gradient(135deg, #ff0033, #b30024);
             color: white;
-            padding: 12px;
-            font-size: 15px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: 600;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 0, 51, 0.4);
-            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(255, 0, 51, 0.4);
         }
-        .btn:hover { background: linear-gradient(135deg, #ff1a4d, #cc0029); }
+        button:hover { background: linear-gradient(135deg, #ff1a4d, #cc0029); }
         
-        #previewSection {
-            display: none;
-            margin-top: 15px;
-            background: #120505;
-            border: 1px solid #441a1a;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: left;
-        }
-        .thumbnail-img {
-            width: 100%;
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
-        .video-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #fff;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
+        /* Progress Bar Styles */
         .progress-container {
-            margin-top: 15px;
+            margin-top: 20px;
             display: none;
         }
         .progress-bar-bg {
             width: 100%;
             background-color: #1a0505;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #441a1a;
             overflow: hidden;
-            height: 16px;
-            margin-bottom: 6px;
+            height: 20px;
+            margin-bottom: 10px;
         }
         .progress-bar-fill {
             height: 100%;
@@ -153,34 +128,18 @@
             background: linear-gradient(90deg, #ff0033, #00ff88);
             transition: width 0.3s ease;
         }
-        .status-text { font-size: 13px; color: #00ff88; font-weight: 600; margin-bottom: 15px; }
-        
-        /* Back Home Button style */
-        .home-btn {
-            background: linear-gradient(135deg, #333333, #1a1a1a);
-            border: 1px solid #555;
-            display: none;
-        }
-        .home-btn:hover {
-            background: linear-gradient(135deg, #444444, #262626);
+        .status-text {
+            font-size: 13px;
+            color: #ff9999;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Downloader</h1>
-        
-        <!-- Step 1: Input URL -->
-        <div id="inputStep">
-            <input type="text" id="urlInput" placeholder="Paste YouTube URL here...">
-            <button class="btn" id="previewBtn" onclick="fetchPreview()">Generate Link & Preview</button>
-        </div>
-
-        <!-- Step 2: Thumbnail Preview & Quality Selection -->
-        <div id="previewSection">
-            <img id="thumbImg" class="thumbnail-img" src="" alt="Thumbnail">
-            <div id="vidTitle" class="video-title"></div>
-
+        <form id="downloadForm">
+            <input type="text" id="url" name="url" placeholder="Paste YouTube URL here..." required>
+            
             <span class="quality-label">Select Download Format:</span>
             <div class="quality-options">
                 <label><input type="radio" name="format_type" value="360"><span>360p</span></label>
@@ -192,99 +151,56 @@
                 <label><input type="radio" name="format_type" value="audio_320"><span>🎵 MP3 Audio (320kbps)</span></label>
             </div>
 
-            <button class="btn" id="downloadBtn" onclick="startDownload()">Download Media</button>
-        </div>
+            <button type="submit" id="submitBtn">Download Media</button>
+        </form>
 
-        <!-- Step 3: Progress Bar & Success State -->
         <div class="progress-container" id="progressContainer">
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBarFill"></div>
             </div>
             <div class="status-text" id="statusText">Initializing...</div>
-            <button class="btn home-btn" id="backHomeBtn" onclick="resetHome()">Back to Home Page</button>
         </div>
     </div>
 
-    <script>
-        let currentUrl = "";
-
-        async function fetchPreview() {
-            const url = document.getElementById('urlInput').value.trim();
-            if (!url) {
-                alert("Please paste a valid YouTube URL first!");
-                return;
-            }
-            currentUrl = url;
-            const btn = document.getElementById('previewBtn');
-            btn.innerText = "Loading Preview...";
-            btn.disabled = true;
-
-            const res = await fetch('/get-info', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: url })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                document.getElementById('thumbImg').src = data.thumbnail;
-                document.getElementById('vidTitle').innerText = data.title;
-                document.getElementById('inputStep').style.display = 'none';
-                document.getElementById('previewSection').style.display = 'block';
-            } else {
-                alert("Error fetching video info: " + data.message);
-                btn.innerText = "Generate Link & Preview";
-                btn.disabled = false;
-            }
-        }
-
-        async function startDownload() {
-            const formatType = document.querySelector('input[name="format_type"]:checked').value;
+<!-- Replace your startDownload() function in templates/index.html with this: -->
+<script>
+    let directDownloadUrl = "";
+    
+    async function startDownload() {
+        const formatType = document.querySelector('input[name="format_type"]:checked').value;
+        document.getElementById('downloadBtn').innerText = "Preparing Link...";
+        document.getElementById('downloadBtn').disabled = true;
+        
+        const formData = new FormData();
+        formData.append('url', currentUrl);
+        formData.append('format_type', formatType);
+        
+        const res = await fetch('/start-download', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if (data.success && data.download_url) {
+            // Instantly trigger browser download using direct stream link
+            const a = document.createElement('a');
+            a.href = data.download_url;
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
             document.getElementById('previewSection').style.display = 'none';
             document.getElementById('progressContainer').style.display = 'block';
-
-            const formData = new FormData();
-            formData.append('url', currentUrl);
-            formData.append('format_type', formatType);
-
-            const res = await fetch('/start-download', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                const interval = setInterval(async () => {
-                    const progRes = await fetch('/progress');
-                    const progData = await progRes.json();
-
-                    progressBarFill.style.width = progData.progress + '%';
-                    statusText.innerText = progData.status;
-
-                    if (progData.progress >= 100 || progData.status.includes('successfully') || progData.status.includes('error')) {
-                        clearInterval(interval);
-                        if (progData.progress >= 100 || progData.status.includes('successfully')) {
-                            statusText.innerText = "✅ Download Complete! Saved to your Downloads folder.";
-                            document.getElementById('backHomeBtn').style.display = 'block';
-                        }
-                    }
-                }, 1000);
-            } else {
-                statusText.innerText = "Failed to start download.";
-            }
+            progressBarFill.style.width = '100%';
+            statusText.innerText = "✅ Download Complete! Check your browser downloads.";
+            document.getElementById('backHomeBtn').style.display = 'block';
+        } else {
+            alert("Error: " + data.message);
+            document.getElementById('downloadBtn').innerText = "Download Media";
+            document.getElementById('downloadBtn').disabled = false;
         }
-
-        function resetHome() {
-            document.getElementById('progressContainer').style.display = 'none';
-            document.getElementById('previewSection').style.display = 'none';
-            document.getElementById('inputStep').style.display = 'block';
-            document.getElementById('urlInput').value = '';
-            document.getElementById('previewBtn').innerText = "Generate Link & Preview";
-            document.getElementById('previewBtn').disabled = false;
-            progressBarFill.style.width = '0%';
-            document.getElementById('backHomeBtn').style.display = 'none';
-            statusText.innerText = "Initializing...";
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
