@@ -7,7 +7,8 @@ from yt_dlp import YoutubeDL
 
 app = Flask(__name__)
 
-DOWNLOAD_DIR = "/data/data/com.termux/files/home/storage/shared/Download"
+# Standard Android public Download directory (fully tracked by Chrome and Android File Manager)
+DOWNLOAD_DIR = "/storage/emulated/0/Download"
 
 download_status = {"progress": 0, "status": "Idle"}
 
@@ -41,6 +42,8 @@ def run_download(url, format_type):
     download_status["status"] = "Starting..."
     
     try:
+        # Ensure the directory exists
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
         output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
         
         if format_type == "audio_320":
