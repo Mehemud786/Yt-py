@@ -36,7 +36,7 @@ def start_download():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        # Extract direct playable stream URL to avoid serverless timeout & missing ffmpeg errors
+        # Extract direct playable stream URL to avoid serverless timeout & missing ffmpeg error
         ydl_opts = {'format': 'best' if format_type != "audio_320" else 'bestaudio'}
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
