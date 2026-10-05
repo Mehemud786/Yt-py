@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termux YouTube Downloader</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0000, #0a0a0a);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(20, 20, 20, 0.85);
+            padding: 35px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(220, 20, 60, 0.25);
+            border: 1px solid rgba(220, 20, 60, 0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ff1a1a, #dc143c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 1px solid #441a1a;
+            background-color: #120505;
+            color: #fff;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #dc143c;
+            box-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+        }
+        
+        .quality-label {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            color: #ff9999;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .quality-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .quality-options label {
+            flex: 1;
+            background-color: #1a0505;
+            border: 1px solid #441a1a;
+            border-radius: 8px;
+            padding: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .quality-options input[type="radio"] {
+            display: none;
+        }
+
+        .quality-options input[type="radio"]:checked + span {
+            color: #fff;
+        }
+
+        .quality-options label:has(input[type="radio"]:checked) {
+            background: linear-gradient(135deg, #ff0033, #dc143c);
+            border-color: #ff1a4d;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+        }
+
+        /* Full width styling for audio choice */
+        .audio-option {
+            margin-bottom: 25px;
+        }
+        .audio-option label {
+            display: block;
+            background-color: #1a0505;
+            border: 1px solid #441a1a;
+            border-radius: 8px;
+            padding: 12px 0;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .audio-option input[type="radio"] {
+            display: none;
+        }
+        .audio-option input[type="radio"]:checked + span {
+            color: #fff;
+        }
+        .audio-option label:has(input[type="radio"]:checked) {
+            background: linear-gradient(135deg, #b30059, #800040);
+            border-color: #ff1a8c;
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #ff0033, #b30024);
+            color: white;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 0, 51, 0.4);
+        }
+        button:hover {
+            background: linear-gradient(135deg, #ff1a4d, #cc0029);
+            box-shadow: 0 6px 20px rgba(255, 0, 51, 0.6);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube Downloader</h1>
+        <form method="POST">
+            <input type="text" name="url" placeholder="Paste YouTube URL here..." required>
+            
+            <span class="quality-label">Select Download Format:</span>
+            
+            <!-- Video Quality Cards -->
+            <div class="quality-options">
+                <label>
+                    <input type="radio" name="format_type" value="360">
+                    <span>360p</span>
+                </label>
+                <label>
+                    <input type="radio" name="format_type" value="720" checked>
+                    <span>720p</span>
+                </label>
+                <label>
+                    <input type="radio" name="format_type" value="1080">
+                    <span>1080p</span>
+                </label>
+            </div>
+
+            <!-- Audio Option Card -->
+            <div class="audio-option">
+                <label>
+                    <input type="radio" name="format_type" value="audio_320">
+                    <span>🎵 MP3 Audio (320kbps)</span>
+                </label>
+            </div>
+
+            <button type="submit">Download Media</button>
+        </form>
+        {% if message %}
+            <p class="message">{{ message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
