@@ -4,6 +4,7 @@ import os
 
 app = Flask(__name__)
 
+# Updated path pointing specifically to the standard Android Download directory used by Chrome
 DOWNLOAD_DIR = "/data/data/com.termux/files/home/storage/shared/Download"
 
 @app.route("/", methods=["GET", "POST"])
@@ -17,7 +18,6 @@ def index():
             try:
                 output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
                 
-                # Check if audio extraction was selected
                 if format_type == "audio_320":
                     command = [
                         "yt-dlp",
@@ -27,9 +27,8 @@ def index():
                         "-P", output_template,
                         url
                     ]
-                    success_msg = "MP3 (320kbps) downloaded successfully! Check your phone's Download folder."
+                    success_msg = "MP3 (320kbps) saved successfully! Check your Chrome / Downloads folder."
                 else:
-                    # Video resolution formatting
                     format_string = f"bestvideo[height<={format_type}]+bestaudio/best[height<={format_type}]"
                     command = [
                         "yt-dlp",
@@ -37,7 +36,7 @@ def index():
                         "-P", output_template,
                         url
                     ]
-                    success_msg = f"Download successful ({format_type}p video)! Check your phone's Download folder."
+                    success_msg = f"Download successful ({format_type}p video)! Check your Chrome / Downloads folder."
                 
                 subprocess.run(command, check=True)
                 message = success_msg
