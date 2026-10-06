@@ -19,11 +19,11 @@ def get_info():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        # Pass cookies.txt so metadata extraction bypasses bot checks
+        # Bypass cookies by specifying the mobile client extractor argument
         ydl_opts = {
             'extract_flat': False, 
             'skip_download': True,
-            'cookiefile': 'cookies.txt'  # <--- Points to your cookie file
+            'extractor_args': {'youtube': {'player_client': ['mweb', 'android']}}
         }
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -50,8 +50,8 @@ def start_download():
         
         ydl_opts = {
             'outtmpl': output_template,
-            'cookiefile': 'cookies.txt',  # <--- Ensures downloading passes auth
-            'newline': True
+            'newline': True,
+            'extractor_args': {'youtube': {'player_client': ['mweb', 'android']}}
         }
         
         if format_type == "audio_320":
