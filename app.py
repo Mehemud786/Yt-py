@@ -4,6 +4,9 @@ from yt_dlp import YoutubeDL
 
 app = Flask(__name__)
 
+DOWNLOAD_DIR = "/storage/emulated/0/Download"
+download_status = {"progress": 0, "status": "Idle"}
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
@@ -16,7 +19,12 @@ def get_info():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        ydl_opts = {'extract_flat': False, 'skip_download': True}
+        # Pass cookies.txt so metadata extraction bypasses bot checks
+        ydl_opts = {
+            'extract_flat': False, 
+            'skip_download': True,
+            'cookiefile': 'cookies.txt'  # <--- Points to your cookie file
+        }
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             return jsonify({
@@ -37,22 +45,37 @@ def start_download():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        # Vercel functions save temporary server-side files to /tmp
-        output_template = os.path.join("/tmp", "%(title)s.%(ext)s")
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+        output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
         
-        ydl_opts = {'outtmpl': output_template}
+        ydl_opts = {
+            'outtmpl': output_template,
+            'cookiefile': 'cookies.txt',  # <--- Ensures downloading passes auth
+            'newline': True
+        }
         
         if format_type == "audio_320":
             ydl_opts['format'] = 'bestaudio'
+            ydl_opts['postprocessors'] = [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '320',
+            }]
         else:
-            ydl_opts['format'] = f"best[height<={format_type}]" # safer single-file fallback format for serverless without local ffmpeg merging
+            ydl_opts['format'] = f"bestvideo[height<={format_type}]+bestaudio/best[height<={format_type}]"
             
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
             
-        return jsonify({"success": True, "message": "Download complete on server!"})
+        download_status["progress"] = 100
+        download_status["status"] = "Download completed successfully!"
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
+
+@app.route("/progress", methods=["GET"])
+def progress():
+    return jsonify(download_status)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
