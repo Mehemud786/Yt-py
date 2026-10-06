@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud YouTube Downloader</title>
+    <title>Termux YouTube Downloader</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -106,6 +106,8 @@
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255, 0, 51, 0.4);
             margin-bottom: 10px;
+            text-decoration: none;
+            display: inline-block;
         }
         .btn:hover { background: linear-gradient(135deg, #ff1a4d, #cc0029); }
         
@@ -118,33 +120,34 @@
             padding: 12px;
             text-align: left;
         }
-        .thumbnail-img {
-            width: 100%;
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
+        .thumbnail-img { width: 100%; border-radius: 6px; margin-bottom: 8px; }
         .video-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #fff;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #fff;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .status-text { font-size: 13px; color: #00ff88; font-weight: 600; margin-top: 15px; display: none; }
+        
+        .progress-container { margin-top: 15px; display: none; }
+        .progress-bar-bg {
+            width: 100%; background-color: #1a0505; border-radius: 6px;
+            border: 1px solid #441a1a; overflow: hidden; height: 16px; margin-bottom: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #ff0033, #00ff88);
+            transition: width 0.3s ease;
+        }
+        .status-text { font-size: 13px; color: #00ff88; font-weight: 600; margin-bottom: 15px; }
+        
+        .action-btns { display: none; }
         .home-btn {
             background: linear-gradient(135deg, #333333, #1a1a1a);
             border: 1px solid #555;
-            display: none;
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Cloud YouTube Downloader</h1>
+        <h1>YouTube Downloader</h1>
         
         <div id="inputStep">
             <input type="text" id="urlInput" placeholder="Paste YouTube URL here...">
@@ -169,8 +172,17 @@
             <button class="btn" id="downloadBtn" onclick="startDownload()">Download Media</button>
         </div>
 
-        <div class="status-text" id="statusText">Processing download on server...</div>
-        <button class="btn home-btn" id="backHomeBtn" onclick="resetHome()">Back to Home Page</button>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+            <div class="status-text" id="statusText">Initializing...</div>
+            
+            <div class="action-btns" id="actionBtns">
+                <a href="/download-file" class="btn" id="chromeDownloadBtn">📥 Download File to Chrome</a>
+                <button class="btn home-btn" onclick="resetHome()">Back to Home Page</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -205,12 +217,8 @@
 
         async function startDownload() {
             const formatType = document.querySelector('input[name="format_type"]:checked').value;
-            document.getElementById('downloadBtn').innerText = "Downloading...";
-            document.getElementById('downloadBtn').disabled = true;
-            
-            const statusText = document.getElementById('statusText');
-            statusText.style.display = 'block';
-            statusText.innerText = "Processing request on cloud server...";
+            document.getElementById('previewSection').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'block';
 
             const formData = new FormData();
             formData.append('url', currentUrl);
@@ -223,25 +231,34 @@
             const data = await res.json();
 
             if (data.success) {
-                statusText.innerText = "✅ Download Complete on Server Storage!";
-                document.getElementById('backHomeBtn').style.display = 'block';
+                const interval = setInterval(async () => {
+                    const progRes = await fetch('/progress');
+                    const progData = await progRes.json();
+
+                    progressBarFill.style.width = progData.progress + '%';
+                    statusText.innerText = progData.status;
+
+                    if (progData.progress >= 100 || progData.status.includes('successfully')) {
+                        clearInterval(interval);
+                        statusText.innerText = "✅ Download Complete!";
+                        document.getElementById('actionBtns').style.display = 'block';
+                    }
+                }, 1000);
             } else {
-                statusText.innerText = "❌ Error: " + data.message;
-                document.getElementById('downloadBtn').innerText = "Download Media";
-                document.getElementById('downloadBtn').disabled = false;
+                statusText.innerText = "Failed to start download.";
             }
         }
 
         function resetHome() {
-            document.getElementById('statusText').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'none';
             document.getElementById('previewSection').style.display = 'none';
             document.getElementById('inputStep').style.display = 'block';
             document.getElementById('urlInput').value = '';
             document.getElementById('previewBtn').innerText = "Generate Link & Preview";
             document.getElementById('previewBtn').disabled = false;
-            document.getElementById('downloadBtn').innerText = "Download Media";
-            document.getElementById('downloadBtn').disabled = false;
-            document.getElementById('backHomeBtn').style.display = 'none';
+            progressBarFill.style.width = '0%';
+            document.getElementById('actionBtns').style.display = 'none';
+            statusText.innerText = "Initializing...";
         }
     </script>
 </body>

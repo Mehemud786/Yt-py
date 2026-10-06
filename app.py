@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import os
 from yt_dlp import YoutubeDL
 
 app = Flask(__name__)
 
 DOWNLOAD_DIR = "/storage/emulated/0/Download"
-download_status = {"progress": 0, "status": "Idle"}
+download_status = {"progress": 0, "status": "Idle", "filename": ""}
 
 @app.route("/", methods=["GET"])
 def index():
@@ -19,7 +19,6 @@ def get_info():
         return jsonify({"success": False, "message": "No URL provided."})
     
     try:
-        # Bypass cookies by specifying the mobile client extractor argument
         ydl_opts = {
             'extract_flat': False, 
             'skip_download': True,
@@ -65,10 +64,15 @@ def start_download():
             ydl_opts['format'] = f"bestvideo[height<={format_type}]+bestaudio/best[height<={format_type}]"
             
         with YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info)
+            if format_type == "audio_320":
+                filename = os.path.splitext(filename)[0] + ".mp3"
+                
+            download_status["filename"] = filename
+            download_status["progress"] = 100
+            download_status["status"] = "Download completed successfully!"
             
-        download_status["progress"] = 100
-        download_status["status"] = "Download completed successfully!"
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)})
@@ -76,6 +80,13 @@ def start_download():
 @app.route("/progress", methods=["GET"])
 def progress():
     return jsonify(download_status)
+
+@app.route("/download-file", methods=["GET"])
+def download_file():
+    file_path = download_status.get("filename")
+    if file_path and os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    return "File not found", 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
