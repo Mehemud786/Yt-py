@@ -1,0 +1,29 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/info/route.js": {
+      "maxDuration": 30,
+      "memory": 512
+    },
+    "app/api/download/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        },
+        {
+          "key": "Access-Control-Expose-Headers",
+          "value": "Content-Disposition, Content-Length"
+        }
+      ]
+    }
+  ]
+}
